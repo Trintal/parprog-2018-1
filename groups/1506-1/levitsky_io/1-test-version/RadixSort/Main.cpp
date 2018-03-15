@@ -1,15 +1,14 @@
 #define _CRT_SECURE_NO_WARNINGS
-/*
-LAB #3: MSD RADIX SORT FOR DOUBLE NUMBERS
-NON PARALLEL AND PARALLEL VERSIONS
-DESIGNED BY NIKOLAY KOMAROV
-*/
-
+#pragma once;
+#include <cstdio>
+#include <random>
+#include <chrono>
 #include "iostream"
 #include <string>
 #include <ctime>
-
 #include <queue>
+#include <omp.h>
+
 
 using namespace std;
 
@@ -35,22 +34,22 @@ union BinaryInt
 	}
 };
 
-void welcomeWords(int *size)
+void welcomeWords(int size)
 {
-	cout << "\n \nLAB #3: MSD RADIX SORT FOR DOUBLE NUMBERS\n \n";
+	//cout << "\n \nLAB #3: MSD RADIX SORT FOR DOUBLE NUMBERS\n \n";
 	orderOfSorting = INCREASE;
-	cout << "Enter size: ";
-	cin >> *size;
+	//cout << "Size: " << size << endl;
+	//cin >> *size;
 }
 
-void initData(BinaryInt **dataArray, int *size)
+void initData(BinaryInt **dataArray, int *size, int* mas)
 {
 	*dataArray = new BinaryInt[*size];
 	srand(time(NULL));
 	rand();
 	for (int i = 0; i < *size; i++)
 	{
-		(*dataArray)[i] = BinaryInt(rand());
+		(*dataArray)[i] = BinaryInt(mas[i]);
 	}
 }
 
@@ -65,17 +64,17 @@ void printArray(BinaryInt **array, int *size)
 {
 	for (int i = 0; i < *size - 1; i++)
 	{
-		cout << (*array)[i].d << ", ";
+		//cout << (*array)[i].d << ", ";
 	}
-	cout << (*array)[*size - 1].d << "\n";
+	//cout << (*array)[*size - 1].d << "\n";
 }
 
 void outputMessage(double *time1, double *time2, bool isRight)
 {
-	cout << "\n--- RESULTS ---\n\nTime of non-parallel algorythm: " << *time1 <<
-		" ms\nTime of parallel algorythm:     " << *time2 << " ms\n" <<
-		"Speedup: " << *time1 / *time2 << "\n" <<
-		"Results are the same: " << isRight << "\n";
+	//cout << "\n--- RESULTS ---\n\nTime of non-parallel algorythm: " << *time1 <<
+	//	" ms\nTime of parallel algorythm:     " << *time2 << " ms\n" <<
+	//	"Speedup: " << *time1 / *time2 << "\n" <<
+	//	"Results are the same: " << isRight << "\n";
 }
 
 void RadixSort(queue<BinaryInt> *data, queue<BinaryInt> *sortedData, int *numOfByte, int *numOfBitInByte)
@@ -181,10 +180,30 @@ bool checkResult(BinaryInt **nonParallel, BinaryInt **parallel, int *size)
 	return true;
 }
 
-int main()
+int main(int argc, char * argv[])
 {
-	cout.precision(15);
+	//cout.precision(15);
 	int size;
+	int num_threads = 1;
+	if (argc > 1)
+	{
+		num_threads = atoi(argv[1]);
+	}
+	freopen("Sort.in", "rb", stdin);
+	freopen("Sort.out", "wb", stdout);
+
+	//omp_set_num_threads(num_threads);
+
+	fread(&size, sizeof(size), 1, stdin);
+	int* mas = new int[size];
+	fread(mas, sizeof(mas), size, stdin);
+
+	//cout << endl << endl;
+	//cout << "mas:   ";
+	//for (int i = 0; i < size; i++)
+		//cout << mas[i] << " ";
+	//cout << endl << endl;
+
 	BinaryInt *nonParallel = nullptr;
 	BinaryInt *parallel = nullptr;
 	BinaryInt *parallelCopy = nullptr;
@@ -194,18 +213,18 @@ int main()
 	double endTime = 0;
 	double timeOfNonParallel = 0;
 	double timeOfParallel = 0;
-	welcomeWords(&size);
-	initData(&nonParallel, &size);
-	cout << "[TRACE] Data was initialized \n";
+	welcomeWords(size);
+	initData(&nonParallel, &size, mas);
+	//cout << "[TRACE] Data was initialized \n";
 	copyData(&nonParallel, &parallel, &size);
-	cout << "[TRACE] Data was copied \n";
-	cout << "[INFO ] Size equals: " << size << "\n";
+	//cout << "[TRACE] Data was copied \n";
+	//cout << "[INFO ] Size equals: " << size << "\n";
 
 	printArray(&nonParallel, &size);
 
 	/* ---------- START OF NON PARALLEL ALGORITHM ------------------ */
 	startTime = clock();
-	cout << "[TRACE] Start time of non-parallel algorythm: " << startTime << "\n";
+	//cout << "[TRACE] Start time of non-parallel algorythm: " << startTime << "\n";
 
 	queue<BinaryInt> queueData;
 	queue<BinaryInt> sortedData;
@@ -214,16 +233,15 @@ int main()
 	}
 	int u = 3; int o = 128;
 	RadixSort(&queueData, &sortedData, &u, &o);
-	cout << "[TRACE] Array was sorted by non-parallel algorythm \n";
+	//cout << "[TRACE] Array was sorted by non-parallel algorythm \n";
 	setResult(&sortedData, &nonParallel);
 
 	endTime = clock();
-	cout << "[TRACE] End time of non-parallel algorythm: " << endTime << "\n";
+	//cout << "[TRACE] End time of non-parallel algorythm: " << endTime << "\n";
 	timeOfNonParallel = endTime - startTime;
-	cout << "[TRACE] Total time of non-parallel algorythm: " << timeOfNonParallel << " ms\n";
+	//cout << "[TRACE] Total time of non-parallel algorythm: " << timeOfNonParallel << " ms\n";
 
 	printArray(&nonParallel, &size);
-
 	system("pause");
 	return 0;
 }
