@@ -19,7 +19,7 @@ int main()
 
 	ofstream fout("output.txt");
 	for (int i = 0; i < size; i++)
-		fout << sortedmas[i] << endl;
+		fout << sortedmas[i] << " ";
 	fout.close();
 	return 0;
 }
