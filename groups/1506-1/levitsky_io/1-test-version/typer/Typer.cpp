@@ -6,10 +6,11 @@
 #include <string>
 using namespace std;
 
-int main()
+void main(int argc, char* argv[])
 {
 	int size;
 	int* mas;
+	char* name = argv[1];
 	ifstream fin("input.txt");
 	fin >> size;
 
@@ -21,10 +22,9 @@ int main()
 	}
 	fin.close();
 
-	freopen("Sort.in", "wb", stdout);
+	freopen(name, "wb", stdout);
 
 	fwrite(&size, sizeof(size), 1, stdout);
 	fwrite(mas, sizeof(*mas), size, stdout);
 
-	return 0;
 }
