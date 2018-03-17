@@ -185,11 +185,16 @@ int main(int argc, char * argv[])
 	//cout.precision(15);
 	int size;
 	int num_threads = 1;
-	if (argc > 1)
+	char* input = argv[1];
+	char* output = argv[2];
+
+	if (argc > 2)
 	{
 		num_threads = atoi(argv[1]);
+		char* input = argv[2];
+		char* output = argv[3];
 	}
-	freopen("Sort.in", "rb", stdin);
+	freopen(("tests\\", input), "rb", stdin);
 	//freopen("Sort.out", "wb", stdout);
 
 	//omp_set_num_threads(num_threads);
@@ -248,8 +253,9 @@ int main(int argc, char * argv[])
 		sorted[i] = nonParallel[i].d;
 		//cout << sorted[i] << " ";
 	}
-	freopen("Sort.out", "wb", stdout);
+	freopen(("tests\\", output), "wb", stdout);
 	fwrite(&size, sizeof(size), 1, stdout);
+	//fwrite(&timeOfNonParallel, sizeof(timeOfNonParallel), 1, stdout);
 	fwrite(sorted, sizeof(*sorted), size, stdout);
 	return 0;
 }

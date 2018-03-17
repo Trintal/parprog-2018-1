@@ -11,7 +11,7 @@ void main(int argc, char* argv[])
 	int size;
 	int* mas;
 	char* name = argv[1];
-	ifstream fin("input.txt");
+	ifstream fin("tests\\input.txt");
 	fin >> size;
 
 	mas = new int[size];
@@ -22,7 +22,7 @@ void main(int argc, char* argv[])
 	}
 	fin.close();
 
-	freopen(name, "wb", stdout);
+	freopen(("tests\\", name), "wb", stdout);
 
 	fwrite(&size, sizeof(size), 1, stdout);
 	fwrite(mas, sizeof(*mas), size, stdout);

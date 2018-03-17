@@ -24,7 +24,7 @@ int main (int argc, char* argv [])
 
 	//sort(sorted, sorted + size);
 
-	ofstream fin("input.txt");
+	ofstream fin("tests\\input.txt");
 	fin << size << endl;
 	for (int i = 0; i < size; i++)
 		fin << mas[i] << " ";
