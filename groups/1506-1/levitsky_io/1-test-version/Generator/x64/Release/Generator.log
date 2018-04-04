@@ -1,5 +1,5 @@
 ﻿  Generator.cpp
-Generator.cpp(26): warning C4244: аргумент: преобразование "time_t" в "unsigned int", возможна потеря данных
+Generator.cpp(27): warning C4244: аргумент: преобразование "time_t" в "unsigned int", возможна потеря данных
   Создание кода
   Создание кода завершено
   1 of 12 functions ( 8.3%) were compiled, the rest were copied from previous compilation.
