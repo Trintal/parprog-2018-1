@@ -1,0 +1,6 @@
+﻿  Generator.cpp
+Generator.cpp(31): warning C4244: аргумент: преобразование "time_t" в "unsigned int", возможна потеря данных
+  Создание кода
+  Создание кода завершено
+  All 37 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  Generator.vcxproj -> C:\Users\Trintal\Documents\GitHub\parprog-2018-1\groups\1506-1\levitsky_io\2-openmp\x64\Release\Generator.exe
