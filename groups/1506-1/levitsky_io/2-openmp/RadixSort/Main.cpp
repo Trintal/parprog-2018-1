@@ -63,7 +63,7 @@ void RadixSort(queue<BinaryInt> &data, queue<BinaryInt> &sortedData, int numOfBy
 		}
 		// recursive call must be outside of while loop above
 		numOfByte = numOfBitInByte == 1 ? --numOfByte : numOfByte;
-		numOfBitInByte = numOfBitInByte == 1 ? numOfBitInByte = 64 : numOfBitInByte = numOfBitInByte / 2;
+		numOfBitInByte = numOfBitInByte == 1 ? numOfBitInByte = 128 : numOfBitInByte = numOfBitInByte / 2;
 		int numOfByteCopy2 = numOfByte;
 		int numOfBitInByteCopy2 = numOfBitInByte;
 
@@ -137,7 +137,7 @@ int main(int argc, char * argv[])
 	for (int i = 0; i < size; i++) {
 		queueData.push(nonParallel[i]);
 	}
-	int u = 3; int o = 64;
+	int u = 3; int o = 128;
 
 	RadixSort(queueData, sortedData, u, o);
 	setResult(sortedData, nonParallel);
