@@ -92,6 +92,7 @@ void setResult(queue<BinaryInt> sortedData, BinaryInt *data)
 	for (int i = 0; i < count; i++)
 	{
 		data[i] = sortedData.front();
+		cout << data[i].d << " ";
 		sortedData.pop();
 	}
 }
@@ -110,10 +111,10 @@ int main(int argc, char * argv[])
 	}
 
 	freopen(input, "rb", stdin);
-	fread(&size, sizeof(size), 1, stdin);
+	fread(&size, sizeof(int), 1, stdin);
 	int* mas = new int[size];
 	int* sorted = new int[size];
-	fread(mas, sizeof(mas), size, stdin);
+	fread(mas, sizeof(int), size, stdin);
 	fclose(stdin);
 
 
@@ -149,6 +150,9 @@ int main(int argc, char * argv[])
 	{
 		sorted[i] = nonParallel[i].d;
 	}
+
+	cout << "---" << timeOfNonParallel << "---" << endl;
+
 	freopen(output, "wb", stdout);
 	fwrite(&size, sizeof(size), 1, stdout);
 	fwrite(sorted, sizeof(*sorted), size, stdout);
