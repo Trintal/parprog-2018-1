@@ -8,6 +8,7 @@
 #include <ctime>
 #include <queue>
 #include <omp.h>
+#include "bitset"
 
 
 using namespace std;
@@ -16,7 +17,8 @@ using namespace std;
 union BinaryInt
 {
 	int d;
-	unsigned char c[sizeof(double)];
+	//bitset<32> c;
+	unsigned char c[sizeof(int)];
 
 	BinaryInt()
 	{
@@ -45,20 +47,39 @@ void RadixSort(queue<BinaryInt> &data, queue<BinaryInt> &sortedData, int numOfBy
 {
 	queue<BinaryInt> queueZero;
 	queue<BinaryInt> queueOne;
+	queue<BinaryInt> MqueueZero;
+	queue<BinaryInt> MqueueOne;
+
 
 	if (numOfByte != -1)
 	{
 		while (data.size() != 0)
 		{
-			if (!(numOfBitInByte & data.front().c[numOfByte]))
+			if (data.front().d < 0)
 			{
-				queueZero.push(data.front());
-				data.pop();
+				if (!(numOfBitInByte & data.front().c[numOfByte]))
+				{
+					MqueueOne.push(data.front());
+					data.pop();
+				}
+				else
+				{
+					MqueueZero.push(data.front());
+					data.pop();
+				}
 			}
 			else
 			{
-				queueOne.push(data.front());
-				data.pop();
+				if (!(numOfBitInByte & data.front().c[numOfByte]))
+				{
+					queueZero.push(data.front());
+					data.pop();
+				}
+				else
+				{
+					queueOne.push(data.front());
+					data.pop();
+				}
 			}
 		}
 		// recursive call must be outside of while loop above
@@ -66,6 +87,23 @@ void RadixSort(queue<BinaryInt> &data, queue<BinaryInt> &sortedData, int numOfBy
 		numOfBitInByte = numOfBitInByte == 1 ? numOfBitInByte = 128 : numOfBitInByte = numOfBitInByte / 2;
 		int numOfByteCopy2 = numOfByte;
 		int numOfBitInByteCopy2 = numOfBitInByte;
+
+		if (MqueueOne.size() > 1)
+			RadixSort(MqueueOne, sortedData, numOfByteCopy2, numOfBitInByteCopy2);
+		while (MqueueOne.size() != 0)
+		{
+			sortedData.push(MqueueOne.front());
+			MqueueOne.pop();
+		}
+
+		if (MqueueZero.size() > 1)
+			RadixSort(MqueueZero, sortedData, numOfByte, numOfBitInByte);
+		while (MqueueZero.size() != 0)
+		{
+			sortedData.push(MqueueZero.front());
+			MqueueZero.pop();
+		}
+		//////////////
 
 		if (queueZero.size() > 1)
 			RadixSort(queueZero, sortedData, numOfByte, numOfBitInByte);
