@@ -4,7 +4,8 @@
 #include <ctime>
 #include <algorithm>
 #include <fstream>
-#include "bitset"
+#include "random"
+#include "chrono"
 
 using namespace std;
 
@@ -29,24 +30,17 @@ int main (int argc, char* argv [])
 		}
 	}
 
-	srand(time(NULL));
+	default_random_engine generator(chrono::system_clock::now().time_since_epoch().count());
+	uniform_real_distribution <double> distribution(-1e5, 1e5);
 	int* mas = new int[size];
 	int* sorted = new int[size];
 
 	for (int i = 0; i < size; i++)
 	{
-		mas[i] = (rand()-16000);
+		mas[i] = distribution(generator);
 		sorted[i] = mas[i];
 	}
 
-	//int a = 13;
-	//int b = -13;
-	//cout << a << endl;
-	//cout << b << endl;
-	//bitset<32> bitset = a;
-	//cout << bitset << endl;
-	//bitset = b;
-	//cout << bitset << endl;
 
 	sort(sorted, sorted + size);
 

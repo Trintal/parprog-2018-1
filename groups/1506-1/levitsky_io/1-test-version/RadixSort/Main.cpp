@@ -17,7 +17,6 @@ using namespace std;
 union BinaryInt
 {
 	int d;
-	//bitset<32> c;
 	unsigned char c[sizeof(int)];
 
 	BinaryInt()

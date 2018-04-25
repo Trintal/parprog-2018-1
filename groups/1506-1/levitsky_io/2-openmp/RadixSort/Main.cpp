@@ -43,9 +43,28 @@ void RadixSort(queue<BinaryInt> &data, queue<BinaryInt> &sortedData, int numOfBy
 {
 	queue<BinaryInt> queueZero;
 	queue<BinaryInt> queueOne;
-		if (numOfByte != -1)
+	queue<BinaryInt> MqueueZero;
+	queue<BinaryInt> MqueueOne;
+
+
+	if (numOfByte != -1)
+	{
+		while (data.size() != 0)
 		{
-			while (data.size() != 0)
+			if (data.front().d < 0)
+			{
+				if (!(numOfBitInByte & data.front().c[numOfByte]))
+				{
+					MqueueOne.push(data.front());
+					data.pop();
+				}
+				else
+				{
+					MqueueZero.push(data.front());
+					data.pop();
+				}
+			}
+			else
 			{
 				if (!(numOfBitInByte & data.front().c[numOfByte]))
 				{
@@ -58,28 +77,46 @@ void RadixSort(queue<BinaryInt> &data, queue<BinaryInt> &sortedData, int numOfBy
 					data.pop();
 				}
 			}
-			// recursive call must be outside of while loop above
-			numOfByte = numOfBitInByte == 1 ? --numOfByte : numOfByte;
-			numOfBitInByte = numOfBitInByte == 1 ? numOfBitInByte = 128 : numOfBitInByte = numOfBitInByte / 2;
-			int numOfByteCopy2 = numOfByte;
-			int numOfBitInByteCopy2 = numOfBitInByte;
-
-			if (queueZero.size() > 1)
-				RadixSort(queueZero, sortedData, numOfByte, numOfBitInByte);
-			while (queueZero.size() != 0)
-			{
-				sortedData.push(queueZero.front());
-				queueZero.pop();
-			}
-
-			if (queueOne.size() > 1)
-				RadixSort(queueOne, sortedData, numOfByteCopy2, numOfBitInByteCopy2);
-			while (queueOne.size() != 0)
-			{
-				sortedData.push(queueOne.front());
-				queueOne.pop();
-			}
 		}
+		// recursive call must be outside of while loop above
+		numOfByte = numOfBitInByte == 1 ? --numOfByte : numOfByte;
+		numOfBitInByte = numOfBitInByte == 1 ? numOfBitInByte = 128 : numOfBitInByte = numOfBitInByte / 2;
+		int numOfByteCopy2 = numOfByte;
+		int numOfBitInByteCopy2 = numOfBitInByte;
+
+		if (MqueueOne.size() > 1)
+			RadixSort(MqueueOne, sortedData, numOfByteCopy2, numOfBitInByteCopy2);
+		while (MqueueOne.size() != 0)
+		{
+			sortedData.push(MqueueOne.front());
+			MqueueOne.pop();
+		}
+
+		if (MqueueZero.size() > 1)
+			RadixSort(MqueueZero, sortedData, numOfByte, numOfBitInByte);
+		while (MqueueZero.size() != 0)
+		{
+			sortedData.push(MqueueZero.front());
+			MqueueZero.pop();
+		}
+		//////////////
+
+		if (queueZero.size() > 1)
+			RadixSort(queueZero, sortedData, numOfByte, numOfBitInByte);
+		while (queueZero.size() != 0)
+		{
+			sortedData.push(queueZero.front());
+			queueZero.pop();
+		}
+
+		if (queueOne.size() > 1)
+			RadixSort(queueOne, sortedData, numOfByteCopy2, numOfBitInByteCopy2);
+		while (queueOne.size() != 0)
+		{
+			sortedData.push(queueOne.front());
+			queueOne.pop();
+		}
+	}
 }
 
 
@@ -137,13 +174,15 @@ int main(int argc, char * argv[])
 	char* input = "ExArr.in";
 	char* output = "SortedExArr.out";
 	int thread = 4;
-	omp_set_num_threads(thread);
 
-	if (argc > 2)
+	if (argc > 3)
 	{
-		input = argv[1];
-		output = argv[2];
+		thread = atoi(argv[1]);
+		input = argv[2];
+		output = argv[3];
 	}
+
+	omp_set_num_threads(thread);
 
 	freopen(input, "rb", stdin);
 	fread(&size, sizeof(int), 1, stdin);
@@ -152,7 +191,7 @@ int main(int argc, char * argv[])
 	fread(mas, sizeof(int), size, stdin);
 	fclose(stdin);
 
-	int piece = size / 4;
+	int piece = size / thread;
 
 	//BinaryInt *nonParallel = nullptr;
 	BinaryInt *parallel = new BinaryInt[size];
