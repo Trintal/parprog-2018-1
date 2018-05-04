@@ -14,7 +14,7 @@ int n_tests[] = {10, 20, 50, 100, 200, 500, 1000, 5000, 10000, 50000};
 
 int main (int argc, char* argv [])
 { 
-	int size = 100;
+	int size = 10000;
 	char* name = "ExArr.in";
 	char* ideal = "ExIdealAnsw.out";
 	

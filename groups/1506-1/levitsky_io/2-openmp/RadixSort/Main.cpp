@@ -46,77 +46,83 @@ void RadixSort(queue<BinaryInt> &data, queue<BinaryInt> &sortedData, int numOfBy
 	queue<BinaryInt> MqueueZero;
 	queue<BinaryInt> MqueueOne;
 
-
-	if (numOfByte != -1)
-	{
-		while (data.size() != 0)
-		{
-			if (data.front().d < 0)
+			if (numOfByte != -1)
 			{
-				if (!(numOfBitInByte & data.front().c[numOfByte]))
+				while (data.size() != 0)
 				{
-					MqueueOne.push(data.front());
-					data.pop();
-				}
-				else
-				{
-					MqueueZero.push(data.front());
-					data.pop();
+					if (data.front().d < 0)
+					{
+						if (!(numOfBitInByte & data.front().c[numOfByte]))
+						{
+							MqueueOne.push(data.front());
+							data.pop();
+						}
+						else
+						{
+							MqueueZero.push(data.front());
+							data.pop();
+						}
+					}
+					else
+					{
+						if (!(numOfBitInByte & data.front().c[numOfByte]))
+						{
+							queueZero.push(data.front());
+							data.pop();
+						}
+						else
+						{
+							queueOne.push(data.front());
+							data.pop();
+						}
+					}
 				}
 			}
-			else
+			// recursive call must be outside of while loop above
+			numOfByte = numOfBitInByte == 1 ? --numOfByte : numOfByte;
+			numOfBitInByte = numOfBitInByte == 1 ? numOfBitInByte = 128 : numOfBitInByte = numOfBitInByte / 2;
+			int numOfByteCopy2 = numOfByte;
+			int numOfBitInByteCopy2 = numOfBitInByte;
+			if (MqueueOne.size() > 1)
+				RadixSort(MqueueOne, sortedData, numOfByteCopy2, numOfBitInByteCopy2);
+			//#pragma omp section
+			while (MqueueOne.size() != 0)
 			{
-				if (!(numOfBitInByte & data.front().c[numOfByte]))
-				{
-					queueZero.push(data.front());
-					data.pop();
-				}
-				else
-				{
-					queueOne.push(data.front());
-					data.pop();
-				}
+				sortedData.push(MqueueOne.front());
+				MqueueOne.pop();
 			}
-		}
-		// recursive call must be outside of while loop above
-		numOfByte = numOfBitInByte == 1 ? --numOfByte : numOfByte;
-		numOfBitInByte = numOfBitInByte == 1 ? numOfBitInByte = 128 : numOfBitInByte = numOfBitInByte / 2;
-		int numOfByteCopy2 = numOfByte;
-		int numOfBitInByteCopy2 = numOfBitInByte;
 
-		if (MqueueOne.size() > 1)
-			RadixSort(MqueueOne, sortedData, numOfByteCopy2, numOfBitInByteCopy2);
-		while (MqueueOne.size() != 0)
-		{
-			sortedData.push(MqueueOne.front());
-			MqueueOne.pop();
-		}
+			if (MqueueZero.size() > 1)
+				RadixSort(MqueueZero, sortedData, numOfByte, numOfBitInByte);
 
-		if (MqueueZero.size() > 1)
-			RadixSort(MqueueZero, sortedData, numOfByte, numOfBitInByte);
-		while (MqueueZero.size() != 0)
-		{
-			sortedData.push(MqueueZero.front());
-			MqueueZero.pop();
-		}
-		//////////////
+			//#pragma omp section
 
-		if (queueZero.size() > 1)
-			RadixSort(queueZero, sortedData, numOfByte, numOfBitInByte);
-		while (queueZero.size() != 0)
-		{
-			sortedData.push(queueZero.front());
-			queueZero.pop();
-		}
+			while (MqueueZero.size() != 0)
+			{
+				sortedData.push(MqueueZero.front());
+				MqueueZero.pop();
+			}
+			//////////////
 
-		if (queueOne.size() > 1)
-			RadixSort(queueOne, sortedData, numOfByteCopy2, numOfBitInByteCopy2);
-		while (queueOne.size() != 0)
-		{
-			sortedData.push(queueOne.front());
-			queueOne.pop();
-		}
-	}
+			if (queueZero.size() > 1)
+				RadixSort(queueZero, sortedData, numOfByte, numOfBitInByte);
+			//#pragma omp section
+
+			while (queueZero.size() != 0)
+			{
+				sortedData.push(queueZero.front());
+				queueZero.pop();
+			}
+
+			if (queueOne.size() > 1)
+				RadixSort(queueOne, sortedData, numOfByteCopy2, numOfBitInByteCopy2);
+			//#pragma omp section
+
+			while (queueOne.size() != 0)
+			{
+				sortedData.push(queueOne.front());
+				queueOne.pop();
+			}
 }
 
 
@@ -126,7 +132,6 @@ void setResult(queue<BinaryInt> sortedData, BinaryInt *data)
 	for (int i = 0; i < count; i++)
 	{
 		data[i] = sortedData.front();
-		//cout << data[i].d << " ";
 		sortedData.pop();
 	}
 }
@@ -210,40 +215,33 @@ int main(int argc, char * argv[])
 
 	startTime = clock();
 
-#pragma omp parallel private (i, queueData, sortedData)
-	{
-		//parallel = new BinaryInt[size];
-		int num = omp_get_thread_num();
-		cout << "Helo epta from " << num << endl;
 
-		//initData(parallel, size, mas);
-#pragma omp for schedule(dynamic, piece)
-		for (i = 0; i <size; i++)
-		{
-			parallel[i] = BinaryInt(mas[i]);
-		}
+		//parallel = new BinaryInt[size];
+
+		initData(parallel, size, mas);
 
 		/////////////////////////////////
-		//startTime = clock();
-#pragma omp for schedule(dynamic, piece)
+		startTime = clock();
 		for (i = 0; i < size; i++) {
 			queueData.push(parallel[i]);
 		}
-		int u = 3; int o = 128;
-
-		RadixSort(queueData, sortedData, u, o);
-		setResult(sortedData, parallel);
-
-#pragma omp barrier
-		//parallelCopy = merge(parallelCopy, parallel, piece, size);
-
-#pragma omp for schedule(dynamic, piece)
-		for (i = 0; i < size; i++)
+#pragma omp parallel
 		{
-			sorted[i] = parallel[i].d;
+			int u = 3; int o = 128;
+#pragma omp sections
+			{
+#pragma omp section
+				RadixSort(queueData, sortedData, u, o);
+			}
+			setResult(sortedData, parallel);
+
 		}
-		
+//#pragma omp for schedule(dynamic, piece)
+	for (i = 0; i < size; i++)
+	{
+		sorted[i] = parallel[i].d;
 	}
+		
 	endTime = clock();
 	timeOfNonParallel = endTime - startTime;
 	cout << "---" << timeOfNonParallel << "---" << endl;

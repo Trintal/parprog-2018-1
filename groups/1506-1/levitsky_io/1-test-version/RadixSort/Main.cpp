@@ -129,7 +129,7 @@ void setResult(queue<BinaryInt> sortedData, BinaryInt *data)
 	for (int i = 0; i < count; i++)
 	{
 		data[i] = sortedData.front();
-		cout << data[i].d << " ";
+		//cout << data[i].d << " ";
 		sortedData.pop();
 	}
 }
@@ -180,14 +180,13 @@ int main(int argc, char * argv[])
 	RadixSort(queueData, sortedData, u, o);
 	setResult(sortedData, nonParallel);
 
-	endTime = clock();
-	timeOfNonParallel = endTime - startTime;
-
 	for (int i = 0; i < size; i++)
 	{
 		sorted[i] = nonParallel[i].d;
 	}
 
+	endTime = clock();
+	timeOfNonParallel = endTime - startTime;
 	cout << "---" << timeOfNonParallel << "---" << endl;
 
 	freopen(output, "wb", stdout);
