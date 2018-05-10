@@ -138,41 +138,28 @@ void setResult(queue<BinaryInt> sortedData, BinaryInt *data)
 	}
 }
 
-BinaryInt* merge(BinaryInt *&Array)
+void merge(BinaryInt *Array, int size)
 {
-	BinaryInt *sortedArray = new BinaryInt[sizeFirst + sizeSecond];
-		int indexFirst = 0;
-		int indexSecond = 0;
-		int index = 0;
-		while ((indexFirst < sizeFirst) && (indexSecond < sizeSecond))
+		int left = size * omp_get_thread_num();
+		int right = size * (omp_get_thread_num() + 1);
+		int leftsize = left +size;
+		int rightsize = right + size;
+		int tmp = 0;
+
+		while ((left < leftsize) && (right<rightsize))
 		{
-			BinaryInt elementFirst = firstArray[indexFirst];
-			BinaryInt elementSecond = secondArray[indexSecond];
-			if (elementFirst.d < elementSecond.d)
+			if (Array[left].d > Array[right].d)
 			{
-				sortedArray[index] = elementFirst;
-				indexFirst++;
+				tmp = Array[left].d;
+				Array[left].d = Array[right].d;
+				Array[right].d = tmp;
+				right++;
 			}
 			else
 			{
-				sortedArray[index] = elementSecond;
-				indexSecond++;
+				left++;
 			}
-			index++;
 		}
-		while (indexFirst < sizeFirst)
-		{
-			sortedArray[index] = (firstArray)[indexFirst];
-			indexFirst++;
-			index++;
-		}
-		while (indexSecond < sizeSecond)
-		{
-			sortedArray[index] = secondArray[indexSecond];
-			indexSecond++;
-			index++;
-		}
-		return sortedArray;
 }
 
 int main(int argc, char * argv[])
@@ -200,7 +187,7 @@ int main(int argc, char * argv[])
 
 	//BinaryInt *nonParallel = nullptr;
 	BinaryInt *parallel = new BinaryInt[size];
-	BinaryInt *parallelCopy = new BinaryInt[size];
+	//BinaryInt *parallelCopy = new BinaryInt[size];
 	double startTime = 0;
 	double endTime = 0;
 	double timeOfNonParallel = 0;
@@ -247,19 +234,29 @@ int main(int argc, char * argv[])
 		{
 			while (pairs > 1)
 			{
+				int sendsize = piece;
+				if (omp_get_thread_num() >= pairs)
+					merge(parallel, sendsize);
+				sendsize *= 2;
 				pairs = pairs / 2 + pairs % 2;
-				int remainder = omp_get_thread_num() % offset;
-				if(remainder==0 && (pairsprev % pairs == 0 || omp_get_thread_num() != (pairs-1)*offset))
-					parallelCopy = merge();
 			}
 		}
-
 #pragma omp for
 		for (int i = 0; i < piece; i++)
 		{
 			sorted[i] = parallel[i].d;
 		}
 	}
+
+#pragma omp master
+	{
+		for (n = 0; n < size; n++)
+		{
+			cout << sorted[n] << " ";
+		}
+		cout << endl << endl;
+	}
+
 
 	cout << endl << endl;
 	endTime = clock();
@@ -276,7 +273,7 @@ int main(int argc, char * argv[])
 	delete[] sorted;
 	//delete[] nonParallel;
 	delete[] parallel;
-	delete[] parallelCopy;
+	//delete[] parallelCopy;
 
 	return 0;
 }
