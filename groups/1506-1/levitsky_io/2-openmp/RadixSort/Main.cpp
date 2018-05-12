@@ -138,27 +138,46 @@ void setResult(queue<BinaryInt> sortedData, BinaryInt *data)
 	}
 }
 
-void merge(BinaryInt *Array, int size)
+void merge(int* Sorted, BinaryInt *Array, int size)
 {
 		int left = size * omp_get_thread_num();
 		int right = size * (omp_get_thread_num() + 1);
 		int leftsize = left +size;
 		int rightsize = right + size;
-		int tmp = 0;
+		int index = 0;
 
 		while ((left < leftsize) && (right<rightsize))
 		{
-			if (Array[left].d > Array[right].d)
+			int elemfirst = Array[left].d;
+			int elemsecond = Array[right].d;
+
+			if (Array[left].d < Array[right].d)
 			{
-				tmp = Array[left].d;
-				Array[left].d = Array[right].d;
-				Array[right].d = tmp;
-				right++;
+				Sorted[index] = elemfirst;
+				left++;
+				//tmp = Array[left].d;
+				//Array[left].d = Array[right].d;
+				//Array[right].d = tmp;
+				//right++;
 			}
 			else
 			{
-				left++;
+				Sorted[index] = elemsecond;
+				right++;
 			}
+		}
+
+		while (left < leftsize)
+		{
+			Sorted[index] = Array[left].d;
+			left++;
+			index++;
+		}
+		while (right < rightsize)
+		{
+			Sorted[index] = Array[right].d;
+			right++;
+			index++;
 		}
 }
 
@@ -230,22 +249,36 @@ int main(int argc, char * argv[])
 		int pairsprev = thread / 2;
 		int offset = 2;
 
-		if (omp_get_thread_num() % 2 == 0)
+		int counter = 2;
+		int sendsize = piece;
+		/*while (pairs > 1)
 		{
-			while (pairs > 1)
+			pairs = pairs / 2 + pairs % 2;
+			if (pairsprev % pairs == 0 || omp_get_thread_num() != (pairs - 1) * offset)
 			{
 				int sendsize = piece;
-				if (omp_get_thread_num() >= pairs)
-					merge(parallel, sendsize);
+				cout << "Ama proces :" << omp_get_thread_num() << endl;
+				merge(sorted, parallel, sendsize);
 				sendsize *= 2;
-				pairs = pairs / 2 + pairs % 2;
 			}
-		}
-#pragma omp for
-		for (int i = 0; i < piece; i++)
+			pairsprev = pairs;
+			offset *= 2;
+		}*/
+
+		while (pairs > 1)
 		{
-			sorted[i] = parallel[i].d;
+			pairs = pairs / 2 + pairs % 2;
+			if(omp_get_thread_num() % counter == 0 || omp_get_thread_num() % counter == counter)
+				merge(sorted, parallel, sendsize);
+			sendsize *= 2;
+			counter *= 2;
 		}
+
+//#pragma omp for
+//		for (int i = 0; i < piece; i++)
+//		{
+//			sorted[i] = parallel[i].d;
+//		}
 	}
 
 #pragma omp master
