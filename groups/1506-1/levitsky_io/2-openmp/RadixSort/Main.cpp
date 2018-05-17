@@ -182,6 +182,37 @@ void merge(int* &Sorted, BinaryInt *&Array, int size)
 			Array[i].d = Sorted[i];
 }
 
+void sorting(queue<BinaryInt> queueData, queue<BinaryInt> sortedData, BinaryInt *parallel, int* mas, int size, int piece)
+{
+#pragma omp parallel private (queueData, sortedData)
+	{
+#pragma omp for
+		for (int i = 0; i < size; i++) {
+			queueData.push(parallel[i]);
+		}
+
+		int u = 3; int o = 128;
+		RadixSort(queueData, sortedData, u, o);
+
+		setResult(sortedData, parallel);
+
+		int sendsize = piece;
+		int counter = 2;
+
+#pragma omp barrier
+		while (sendsize < size)
+		{
+			if (omp_get_thread_num() % counter == 0)
+			{
+				merge(mas, parallel, sendsize);
+			}
+			sendsize *= 2;
+			counter *= 2;
+#pragma omp barrier
+		}
+	}
+}
+
 int main(int argc, char * argv[])
 {
 	int size;
@@ -201,7 +232,6 @@ int main(int argc, char * argv[])
 	freopen(input, "rb", stdin);
 	fread(&size, sizeof(int), 1, stdin);
 	int* mas = new int[size];
-	//int* sorted = new int[size];
 	fread(mas, sizeof(int), size, stdin);
 	fclose(stdin);
 
@@ -218,41 +248,11 @@ int main(int argc, char * argv[])
 	initData(parallel, size, mas);
 
 	int piece = size / thread;
-	int n = 0;
 
-	/////////////////////////////////
 	startTime = clock();
-
-#pragma omp parallel private (queueData, sortedData)
-	{
-#pragma omp for
-		for (int i = 0; i < size; i++) {
-			queueData.push(parallel[i]);
-		}
-
-		int u = 3; int o = 128;
-		RadixSort(queueData, sortedData, u, o);
-
-		setResult(sortedData, parallel);
-
-		int sendsize = piece;
-		int counter = 2;
-
-#pragma omp barrier
-		while (sendsize < size)
-		{
-			if (omp_get_thread_num()% counter ==0 )
-			{
-				merge(mas, parallel, sendsize);
-			}
-			sendsize *= 2;
-			counter *= 2;
-		#pragma omp barrier
-		}
-	}
-
-	cout << endl << endl;
+	sorting(queueData, sortedData, parallel, mas, size, piece);
 	endTime = clock();
+
 	timeOfNonParallel = endTime - startTime;
 	cout << "---" << timeOfNonParallel << "---" << endl;
 	
