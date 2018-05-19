@@ -1,6 +1,6 @@
 ﻿  Viewer.cpp
 Viewer.cpp(18): warning C4101: time: неиспользованная локальная переменная
   Создание кода
-  All 129 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
   Создание кода завершено
+  All 129 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
   Viewer.vcxproj -> C:\Users\Trintal\Documents\GitHub\parprog-2018-1\groups\1506-1\levitsky_io\1-test-version\x64\Release\Viewer.exe
